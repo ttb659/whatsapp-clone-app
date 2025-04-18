@@ -15,4 +15,9 @@ export interface Message {
   // Relations
   sender?: User;
   files?: FileAttachment[];
+  
+  // Virtual properties for component usage
+  user?: User; // Alias for sender
+  user_id?: number; // Alias for sender_id
+  read_at?: string; // For read status display
 }

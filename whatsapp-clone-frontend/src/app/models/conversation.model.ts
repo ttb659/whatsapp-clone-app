@@ -16,4 +16,9 @@ export interface Conversation {
   // Helper properties for UI
   unread_count?: number;
   last_message?: Message;
+  
+  // Virtual properties for component usage
+  user?: User; // Represents the other user in the conversation
+  users?: User[]; // For compatibility with groups
+  is_group?: boolean;
 }

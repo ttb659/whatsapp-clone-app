@@ -36,7 +36,7 @@
             <mat-icon>arrow_back</mat-icon>
           </button>
           <div class="conversation-info">
-            <span>{{ selectedConversation.user?.name }}</span>
+            <span>{{ selectedConversation.is_group ? 'Group' : (selectedConversation.user?.name || 'Chat') }}</span>
           </div>
           <div class="toolbar-actions">
             <button mat-icon-button>

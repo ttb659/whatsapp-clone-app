@@ -1,74 +1,126 @@
 # WhatsApp Clone
 
-Une application de messagerie inspirée de WhatsApp, développée avec Laravel pour le backend et Angular pour le frontend.
+Une application de messagerie en temps réel inspirée de WhatsApp, construite avec Laravel (backend) et Angular (frontend).
 
 ## Fonctionnalités
 
-- **Authentification** : Inscription, connexion, déconnexion avec Laravel Sanctum
-- **Messagerie en temps réel** : Communication instantanée via WebSockets
-- **Gestion des groupes** : Création et gestion de groupes de discussion
+- **Authentification** : Inscription, connexion et déconnexion sécurisées avec Laravel Sanctum
+- **Messagerie en temps réel** : Communication instantanée via WebSockets (Pusher)
+- **Conversations privées** : Discussions en tête-à-tête entre utilisateurs
+- **Groupes de discussion** : Création et gestion de groupes avec plusieurs participants
 - **Partage de fichiers** : Envoi d'images, vidéos et documents
-- **Notifications push** : Alertes pour les nouveaux messages
+- **Interface responsive** : Adaptée aux appareils mobiles et desktop
 
-## Structure du projet
+## Technologies utilisées
 
-Le projet est divisé en deux parties principales :
+### Backend (Laravel)
+- Laravel 12
+- Laravel Sanctum pour l'authentification
+- Pusher pour les WebSockets
+- SQLite pour la base de données
 
-- **Backend** : API Laravel avec Sanctum et WebSockets
-- **Frontend** : Application Angular avec Material UI
+### Frontend (Angular)
+- Angular 17
+- Angular Material pour l'interface utilisateur
+- Socket.io-client pour la connexion WebSocket
+- RxJS pour la programmation réactive
 
-## Installation
+## Installation et démarrage
 
 ### Prérequis
-
-- PHP 8.2+
+- PHP 8.2 ou supérieur
 - Composer
 - Node.js et npm
 - Angular CLI
-- MySQL ou SQLite
 
-### Backend (Laravel)
+### Installation
 
+1. Cloner le dépôt :
+```bash
+git clone https://github.com/votre-utilisateur/whatsapp-clone.git
+cd whatsapp-clone
+```
+
+2. Installer les dépendances du backend :
 ```bash
 cd whatsapp-clone-backend
 composer install
 cp .env.example .env
 php artisan key:generate
-php artisan migrate
-php artisan serve --port=12000
 ```
 
-### Frontend (Angular)
+3. Configurer la base de données dans le fichier .env :
+```
+DB_CONNECTION=sqlite
+DB_DATABASE=/chemin/absolu/vers/database.sqlite
+```
 
+4. Créer le fichier de base de données SQLite :
+```bash
+touch database/database.sqlite
+```
+
+5. Exécuter les migrations :
+```bash
+php artisan migrate --seed
+```
+
+6. Installer les dépendances du frontend :
+```bash
+cd ../whatsapp-clone-frontend
+npm install
+```
+
+### Démarrage
+
+Utilisez le script de démarrage pour lancer les deux serveurs :
+```bash
+./start-servers.sh
+```
+
+Ou démarrez-les séparément :
+
+1. Backend :
+```bash
+cd whatsapp-clone-backend
+php artisan serve --host=0.0.0.0 --port=12000
+```
+
+2. Frontend :
 ```bash
 cd whatsapp-clone-frontend
-npm install
-ng serve --port 12001 --host 0.0.0.0 --disable-host-check
+ng serve --host 0.0.0.0 --port 12001 --disable-host-check
 ```
 
-## Utilisation
+## Accès à l'application
 
-1. Créez un compte utilisateur
-2. Connectez-vous à l'application
-3. Commencez à discuter avec d'autres utilisateurs
-4. Créez des groupes pour les discussions de groupe
-5. Partagez des fichiers dans les conversations
+- Backend API : http://localhost:12000
+- Frontend : http://localhost:12001
 
-## Développement
+## Structure du projet
 
-### Backend
+### Backend (Laravel)
+- `app/Models` : Définitions des modèles (User, Message, Conversation, Group, File)
+- `app/Http/Controllers` : Contrôleurs pour gérer les requêtes API
+- `app/Events` : Événements pour la messagerie en temps réel
+- `database/migrations` : Migrations pour la structure de la base de données
+- `routes/api.php` : Définition des routes API
 
-Le backend est construit avec Laravel 12 et utilise :
-- Laravel Sanctum pour l'authentification API
-- Pusher pour les WebSockets
-- SQLite pour la base de données
+### Frontend (Angular)
+- `src/app/models` : Interfaces TypeScript pour les modèles de données
+- `src/app/services` : Services pour la communication avec l'API
+- `src/app/auth` : Composants d'authentification (login, register)
+- `src/app/chat` : Composants de l'interface de chat
+- `src/app/guards` : Gardes pour protéger les routes
+- `src/app/interceptors` : Intercepteurs HTTP pour l'authentification
 
-### Frontend
+## Développement futur
 
-Le frontend est développé avec Angular 17 et utilise :
-- Angular Material pour l'interface utilisateur
-- Socket.io pour la communication en temps réel
-- RxJS pour la programmation réactive
+- Implémentation des notifications push avec Firebase Cloud Messaging
+- Ajout de fonctionnalités de statut/stories
+- Chiffrement de bout en bout des messages
+- Appels audio et vidéo
+- Mode sombre/clair
 
 ## Licence
 

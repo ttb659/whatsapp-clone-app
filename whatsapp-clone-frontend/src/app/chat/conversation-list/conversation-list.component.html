@@ -16,13 +16,13 @@
           <div class="avatar">
             <!-- Placeholder for user avatar -->
             <div class="avatar-circle">
-              {{ conversation.user?.name.charAt(0) }}
+              {{ conversation.is_group ? 'G' : (conversation.user?.name?.charAt(0) || 'U') }}
             </div>
           </div>
           
           <div class="conversation-details">
             <div class="conversation-header">
-              <span class="name">{{ conversation.user?.name }}</span>
+              <span class="name">{{ conversation.is_group ? 'Group' : (conversation.user?.name || 'User') }}</span>
               <span class="time" *ngIf="conversation.last_message">
                 {{ conversation.last_message.created_at | date:'shortTime' }}
               </span>

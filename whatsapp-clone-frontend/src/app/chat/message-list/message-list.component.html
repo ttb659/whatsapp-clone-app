@@ -11,7 +11,7 @@
        [ngClass]="{'message-item': true, 'sent': isCurrentUserMessage(message), 'received': !isCurrentUserMessage(message)}">
     <div class="message-bubble">
       <div *ngIf="!isCurrentUserMessage(message)" class="message-sender">
-        {{ message.user?.name }}
+        {{ message.sender?.name || message.user?.name || 'User' }}
       </div>
       
       <div class="message-content">
@@ -37,8 +37,8 @@
       <div class="message-meta">
         <span class="message-time">{{ message.created_at | date:'shortTime' }}</span>
         <span *ngIf="isCurrentUserMessage(message)" class="message-status">
-          <mat-icon *ngIf="message.read_at">done_all</mat-icon>
-          <mat-icon *ngIf="!message.read_at">done</mat-icon>
+          <mat-icon *ngIf="message.is_read || message.read_at">done_all</mat-icon>
+          <mat-icon *ngIf="!message.is_read && !message.read_at">done</mat-icon>
         </span>
       </div>
       

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap, of } from 'rxjs';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
 import { User } from '../models/user.model';
 import { environment } from '../../environments/environment';
@@ -13,7 +13,14 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  
   constructor(private http: HttpClient) {
+    this.loadUserFromStorage();
+  }
+  
+  initAuth(): void {
     this.loadUserFromStorage();
   }
   
@@ -23,6 +30,9 @@ export class AuthService {
     
     if (token && user) {
       this.currentUserSubject.next(JSON.parse(user));
+      this.isAuthenticatedSubject.next(true);
+    } else {
+      this.isAuthenticatedSubject.next(false);
     }
   }
   
@@ -32,6 +42,10 @@ export class AuthService {
   
   public get isAuthenticated(): boolean {
     return !!this.currentUserSubject.value;
+  }
+  
+  public getToken(): string | null {
+    return localStorage.getItem('token');
   }
   
   public get token(): string | null {
@@ -59,6 +73,7 @@ export class AuthService {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           this.currentUserSubject.next(null);
+          this.isAuthenticatedSubject.next(false);
         })
       );
   }
@@ -69,6 +84,7 @@ export class AuthService {
         tap(user => {
           localStorage.setItem('user', JSON.stringify(user));
           this.currentUserSubject.next(user);
+          this.isAuthenticatedSubject.next(true);
         })
       );
   }
@@ -77,5 +93,6 @@ export class AuthService {
     localStorage.setItem('token', response.token);
     localStorage.setItem('user', JSON.stringify(response.user));
     this.currentUserSubject.next(response.user);
+    this.isAuthenticatedSubject.next(true);
   }
 }

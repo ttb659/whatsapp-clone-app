@@ -1,118 +1,120 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { Subscription } from 'rxjs';
-import { MessageService } from '../../services/message.service';
-import { WebsocketService } from '../../services/websocket.service';
-import { AuthService } from '../../services/auth.service';
 import { Conversation } from '../../models/conversation.model';
 import { Message } from '../../models/message.model';
 import { User } from '../../models/user.model';
 import { FileAttachment } from '../../models/file.model';
+import { MessageService } from '../../services/message.service';
+import { AuthService } from '../../services/auth.service';
+import { WebsocketService } from '../../services/websocket.service';
 
 @Component({
   selector: 'app-message-list',
+  standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,
     MatIconModule,
     MatMenuModule,
     MatButtonModule
   ],
   templateUrl: './message-list.component.html',
-  styleUrl: './message-list.component.scss',
-  standalone: true
+  styleUrl: './message-list.component.scss'
 })
-export class MessageListComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() conversation: Conversation | null = null;
-  @ViewChild('messageContainer') messageContainer: ElementRef | null = null;
+export class MessageListComponent implements OnInit, OnDestroy, AfterViewChecked {
+  @Input() conversation!: Conversation;
+  @ViewChild('messageContainer') private messageContainer!: ElementRef;
   
   messages: Message[] = [];
+  loading: boolean = true;
   currentUser: User | null = null;
-  loading = false;
-  private messageSubscription: Subscription | null = null;
-  private messageDeletedSubscription: Subscription | null = null;
+  
+  private subscriptions: Subscription[] = [];
+  private shouldScrollToBottom: boolean = true;
   
   constructor(
     private messageService: MessageService,
-    private websocketService: WebsocketService,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private websocketService: WebsocketService
+  ) { }
   
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe(user => {
-      this.currentUser = user;
-    });
+    this.subscriptions.push(
+      this.authService.currentUser$.subscribe(user => {
+        this.currentUser = user;
+      })
+    );
     
-    this.messageSubscription = this.websocketService.onMessage().subscribe(message => {
-      if (this.conversation && 
-          ((message.conversation_id && message.conversation_id === this.conversation.id) ||
-           (message.group_id && message.group_id === this.conversation.id))) {
-        this.messages.push(message);
-        this.scrollToBottom();
-      }
-    });
+    this.loadMessages();
     
-    this.messageDeletedSubscription = this.websocketService.onMessageDeleted().subscribe(data => {
-      const index = this.messages.findIndex(m => m.id === data.message_id);
-      if (index !== -1) {
-        this.messages.splice(index, 1);
-      }
-    });
+    // Listen for new messages
+    this.subscriptions.push(
+      this.websocketService.onMessage().subscribe(message => {
+        if (this.isMessageForCurrentConversation(message)) {
+          this.messages.push(message);
+          this.shouldScrollToBottom = true;
+        }
+      })
+    );
+    
+    // Listen for deleted messages
+    this.subscriptions.push(
+      this.websocketService.onMessageDeleted().subscribe(data => {
+        const index = this.messages.findIndex(m => m.id === data.message_id);
+        if (index !== -1) {
+          this.messages.splice(index, 1);
+        }
+      })
+    );
   }
   
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['conversation'] && this.conversation) {
-      this.loadMessages();
+  ngAfterViewChecked(): void {
+    if (this.shouldScrollToBottom) {
+      this.scrollToBottom();
+      this.shouldScrollToBottom = false;
     }
   }
   
   ngOnDestroy(): void {
-    if (this.messageSubscription) {
-      this.messageSubscription.unsubscribe();
-    }
-    
-    if (this.messageDeletedSubscription) {
-      this.messageDeletedSubscription.unsubscribe();
-    }
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
   
   loadMessages(): void {
-    if (!this.conversation) {
-      return;
-    }
-    
     this.loading = true;
     
     if (this.conversation.user) {
       // This is a direct conversation
-      this.messageService.getConversationMessages(this.conversation.id)
-        .subscribe({
-          next: messages => {
-            this.messages = messages;
-            this.loading = false;
-            this.scrollToBottom();
-          },
-          error: () => {
-            this.loading = false;
-          }
-        });
+      this.messageService.getConversationMessages(this.conversation.id).subscribe({
+        next: (messages) => {
+          this.messages = messages;
+          this.loading = false;
+          this.shouldScrollToBottom = true;
+          
+          // Join the conversation room for real-time updates
+          this.websocketService.joinConversation(this.conversation.id);
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
     } else if (this.conversation.users) {
       // This is a group conversation
-      this.messageService.getGroupMessages(this.conversation.id)
-        .subscribe({
-          next: messages => {
-            this.messages = messages;
-            this.loading = false;
-            this.scrollToBottom();
-          },
-          error: () => {
-            this.loading = false;
-          }
-        });
+      this.messageService.getGroupMessages(this.conversation.id).subscribe({
+        next: (messages) => {
+          this.messages = messages;
+          this.loading = false;
+          this.shouldScrollToBottom = true;
+          
+          // Join the group room for real-time updates
+          this.websocketService.joinGroup(this.conversation.id);
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
     }
   }
   
@@ -126,7 +128,7 @@ export class MessageListComponent implements OnInit, OnChanges, OnDestroy {
   }
   
   isCurrentUserMessage(message: Message): boolean {
-    return this.currentUser?.id === message.user_id;
+    return this.currentUser?.id === (message.sender_id || message.user_id);
   }
   
   getFileUrl(file: FileAttachment): string {
@@ -142,11 +144,17 @@ export class MessageListComponent implements OnInit, OnChanges, OnDestroy {
   }
   
   private scrollToBottom(): void {
-    setTimeout(() => {
-      if (this.messageContainer) {
-        const element = this.messageContainer.nativeElement;
-        element.scrollTop = element.scrollHeight;
-      }
-    }, 100);
+    try {
+      this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
+    } catch (err) { }
+  }
+  
+  private isMessageForCurrentConversation(message: Message): boolean {
+    if (this.conversation.user) {
+      return message.conversation_id === this.conversation.id;
+    } else if (this.conversation.users) {
+      return message.group_id === this.conversation.id;
+    }
+    return false;
   }
 }

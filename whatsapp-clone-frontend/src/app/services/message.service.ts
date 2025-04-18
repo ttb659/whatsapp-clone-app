@@ -46,6 +46,15 @@ export class MessageService {
     return this.http.post<Message>(this.apiUrl, formData);
   }
   
+  // Alias methods for component compatibility
+  sendToConversation(formData: FormData): Observable<Message> {
+    return this.http.post<Message>(this.apiUrl, formData);
+  }
+  
+  sendToGroup(formData: FormData): Observable<Message> {
+    return this.http.post<Message>(this.apiUrl, formData);
+  }
+  
   update(id: number, content: string): Observable<Message> {
     return this.http.put<Message>(`${this.apiUrl}/${id}`, { content });
   }
