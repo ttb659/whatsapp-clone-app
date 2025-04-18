@@ -1,0 +1,48 @@
+<div class="conversation-list-container">
+  <div class="search-container">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search</mat-label>
+      <input matInput type="text" [(ngModel)]="searchTerm" (input)="search()" placeholder="Search conversations">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+  
+  <div class="conversations">
+    <mat-nav-list>
+      <a mat-list-item *ngFor="let conversation of filteredConversations" 
+         (click)="selectConversation(conversation)"
+         [class.selected]="selectedConversationId === conversation.id">
+        <div class="conversation-item">
+          <div class="avatar">
+            <!-- Placeholder for user avatar -->
+            <div class="avatar-circle">
+              {{ conversation.user?.name.charAt(0) }}
+            </div>
+          </div>
+          
+          <div class="conversation-details">
+            <div class="conversation-header">
+              <span class="name">{{ conversation.user?.name }}</span>
+              <span class="time" *ngIf="conversation.last_message">
+                {{ conversation.last_message.created_at | date:'shortTime' }}
+              </span>
+            </div>
+            
+            <div class="conversation-preview">
+              <span class="message" *ngIf="conversation.last_message">
+                {{ conversation.last_message.content }}
+              </span>
+              <span class="no-message" *ngIf="!conversation.last_message">
+                No messages yet
+              </span>
+              
+              <div class="unread-badge" *ngIf="conversation.unread_count">
+                {{ conversation.unread_count }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </mat-nav-list>
+  </div>
+</div>

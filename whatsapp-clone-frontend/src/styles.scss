@@ -1,0 +1,112 @@
+/* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+html, body { 
+  height: 100%; 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+}
+
+body {
+  background-color: #f0f2f5;
+}
+
+.mat-mdc-snack-bar-container {
+  &.success-snackbar {
+    --mdc-snackbar-container-color: #43a047;
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
+  }
+
+  &.error-snackbar {
+    --mdc-snackbar-container-color: #d32f2f;
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+  
+  .auth-card {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    
+    .auth-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      
+      img {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 16px;
+      }
+      
+      h1 {
+        margin: 0;
+        color: #128C7E;
+        font-size: 24px;
+      }
+      
+      p {
+        margin: 8px 0 0;
+        color: #666;
+        text-align: center;
+      }
+    }
+    
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      
+      .form-field {
+        margin-bottom: 16px;
+      }
+      
+      .auth-actions {
+        display: flex;
+        flex-direction: column;
+        margin-top: 16px;
+        
+        button {
+          margin-bottom: 16px;
+          height: 44px;
+          font-size: 16px;
+          
+          &.primary-btn {
+            background-color: #128C7E;
+            color: white;
+          }
+        }
+        
+        .auth-links {
+          display: flex;
+          justify-content: center;
+          margin-top: 8px;
+          
+          a {
+            color: #128C7E;
+            text-decoration: none;
+            font-weight: 500;
+            
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+    }
+  }
+}

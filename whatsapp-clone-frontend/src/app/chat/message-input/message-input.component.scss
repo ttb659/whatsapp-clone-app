@@ -1,0 +1,76 @@
+.message-input-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f0f0;
+  border-top: 1px solid #e0e0e0;
+  padding: 10px;
+}
+
+.selected-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  background-color: white;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  
+  .file-item {
+    display: flex;
+    align-items: center;
+    background-color: #e6f7ff;
+    border-radius: 16px;
+    padding: 4px 8px 4px 12px;
+    
+    .file-name {
+      font-size: 14px;
+      margin-right: 8px;
+      max-width: 150px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    button {
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+      }
+    }
+  }
+}
+
+.input-area {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 24px;
+  padding: 4px;
+}
+
+.message-input {
+  flex: 1;
+  
+  input {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 8px 0;
+    font-size: 15px;
+    
+    &:disabled {
+      background-color: transparent;
+      color: #999;
+    }
+  }
+}
+
+button {
+  color: #128C7E;
+}

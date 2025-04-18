@@ -1,0 +1,57 @@
+<div class="message-list-container" #messageContainer>
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+  </div>
+  
+  <div *ngIf="!loading && messages.length === 0" class="no-messages">
+    <p>No messages yet. Start the conversation!</p>
+  </div>
+  
+  <div *ngFor="let message of messages" 
+       [ngClass]="{'message-item': true, 'sent': isCurrentUserMessage(message), 'received': !isCurrentUserMessage(message)}">
+    <div class="message-bubble">
+      <div *ngIf="!isCurrentUserMessage(message)" class="message-sender">
+        {{ message.user?.name }}
+      </div>
+      
+      <div class="message-content">
+        {{ message.content }}
+      </div>
+      
+      <div *ngIf="message.files && message.files.length > 0" class="message-attachments">
+        <div *ngFor="let file of message.files" class="attachment">
+          <img *ngIf="isImage(file)" [src]="getFileUrl(file)" alt="Image" class="image-attachment">
+          
+          <video *ngIf="isVideo(file)" controls class="video-attachment">
+            <source [src]="getFileUrl(file)" [type]="file.type">
+            Your browser does not support the video tag.
+          </video>
+          
+          <div *ngIf="!isImage(file) && !isVideo(file)" class="file-attachment">
+            <mat-icon>insert_drive_file</mat-icon>
+            <a [href]="getFileUrl(file)" target="_blank" download>{{ file.name }}</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="message-meta">
+        <span class="message-time">{{ message.created_at | date:'shortTime' }}</span>
+        <span *ngIf="isCurrentUserMessage(message)" class="message-status">
+          <mat-icon *ngIf="message.read_at">done_all</mat-icon>
+          <mat-icon *ngIf="!message.read_at">done</mat-icon>
+        </span>
+      </div>
+      
+      <button *ngIf="isCurrentUserMessage(message)" mat-icon-button [matMenuTriggerFor]="messageMenu" class="message-actions">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      
+      <mat-menu #messageMenu="matMenu">
+        <button mat-menu-item (click)="deleteMessage(message)">
+          <mat-icon>delete</mat-icon>
+          <span>Delete</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+</div>
