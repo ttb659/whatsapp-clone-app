@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, tap, of } from 'rxjs';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
 import { User } from '../models/user.model';
 import { environment } from '../../environments/environment';
+import { MockDataService } from './mock-data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,12 +17,22 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   
-  constructor(private http: HttpClient) {
+  private isDemoMode = environment.production && (environment as any).demoMode;
+  
+  constructor(
+    private http: HttpClient,
+    private mockDataService: MockDataService
+  ) {
     this.loadUserFromStorage();
   }
   
   initAuth(): void {
     this.loadUserFromStorage();
+    
+    // En mode démo, on connecte automatiquement l'utilisateur
+    if (this.isDemoMode && !this.isAuthenticated) {
+      this.demoLogin();
+    }
   }
   
   private loadUserFromStorage(): void {
@@ -53,6 +64,10 @@ export class AuthService {
   }
   
   register(data: RegisterRequest): Observable<AuthResponse> {
+    if (this.isDemoMode) {
+      return this.demoRegister(data);
+    }
+    
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data)
       .pipe(
         tap(response => this.handleAuthentication(response))
@@ -60,6 +75,10 @@ export class AuthService {
   }
   
   login(data: LoginRequest): Observable<AuthResponse> {
+    if (this.isDemoMode) {
+      return this.demoLogin();
+    }
+    
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data)
       .pipe(
         tap(response => this.handleAuthentication(response))
@@ -67,6 +86,14 @@ export class AuthService {
   }
   
   logout(): Observable<any> {
+    if (this.isDemoMode) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      this.currentUserSubject.next(null);
+      this.isAuthenticatedSubject.next(false);
+      return of({ message: 'Déconnecté avec succès' });
+    }
+    
     return this.http.post(`${this.apiUrl}/logout`, {})
       .pipe(
         tap(() => {
@@ -79,6 +106,14 @@ export class AuthService {
   }
   
   refreshUser(): Observable<User> {
+    if (this.isDemoMode) {
+      const user = this.mockDataService.getCurrentUser();
+      localStorage.setItem('user', JSON.stringify(user));
+      this.currentUserSubject.next(user);
+      this.isAuthenticatedSubject.next(true);
+      return of(user);
+    }
+    
     return this.http.get<User>(`${this.apiUrl}/user`)
       .pipe(
         tap(user => {
@@ -94,5 +129,22 @@ export class AuthService {
     localStorage.setItem('user', JSON.stringify(response.user));
     this.currentUserSubject.next(response.user);
     this.isAuthenticatedSubject.next(true);
+  }
+  
+  // Méthodes pour le mode démo
+  private demoLogin(data?: LoginRequest): Observable<AuthResponse> {
+    const user = this.mockDataService.getCurrentUser();
+    const response: AuthResponse = {
+      token: 'demo-token-123456789',
+      user: user
+    };
+    
+    this.handleAuthentication(response);
+    return of(response);
+  }
+  
+  private demoRegister(data: RegisterRequest): Observable<AuthResponse> {
+    // En mode démo, on utilise toujours le même utilisateur
+    return this.demoLogin();
   }
 }

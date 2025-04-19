@@ -5,7 +5,9 @@ Une application de messagerie en temps réel inspirée de WhatsApp, construite a
 ## Démo en ligne
 
 Vous pouvez accéder à une démo de l'application à l'adresse suivante :
-- Frontend : https://ttb659.github.io/whatsapp-clone-app (à venir)
+- Frontend : https://ttb659.github.io/whatsapp-clone-app
+
+La démo fonctionne entièrement dans le navigateur sans nécessiter de backend, grâce au mode démo qui simule toutes les fonctionnalités avec des données fictives.
 
 ## Fonctionnalités
 
@@ -97,6 +99,48 @@ cd whatsapp-clone-frontend
 ng serve --host 0.0.0.0 --port=4200
 ```
 
+### Mode démo (sans backend)
+
+Pour utiliser l'application en mode démo sans backend :
+
+1. Construire l'application en mode démo :
+```bash
+cd whatsapp-clone-frontend
+./build-demo.sh
+```
+
+2. Les fichiers générés se trouvent dans le dossier `docs/` et peuvent être servis par n'importe quel serveur web statique.
+
+3. Pour tester localement :
+```bash
+cd docs
+npx http-server -p 8080
+```
+
+4. Accédez à l'application à l'adresse http://localhost:8080
+
+### Déploiement sur GitHub Pages
+
+Pour déployer l'application en mode démo sur GitHub Pages :
+
+1. Construire l'application en mode démo :
+```bash
+cd whatsapp-clone-frontend
+./build-demo.sh
+```
+
+2. Pousser le contenu du dossier `docs/` sur la branche `gh-pages` :
+```bash
+git checkout -b gh-pages
+git add docs/
+git commit -m "Mise à jour de la démo"
+git push origin gh-pages
+```
+
+3. Configurer GitHub Pages dans les paramètres du dépôt pour utiliser la branche `gh-pages` et le dossier racine.
+
+4. L'application sera disponible à l'adresse https://[votre-nom-utilisateur].github.io/whatsapp-clone-app/
+
 ## Accès à l'application
 
 - Backend API : http://localhost:8000
@@ -130,6 +174,8 @@ ng serve --host 0.0.0.0 --port=4200
 - Chiffrement de bout en bout des messages
 - Appels audio et vidéo
 - Mode sombre/clair
+- Amélioration du mode démo avec plus de fonctionnalités simulées
+- Déploiement du backend sur un service d'hébergement comme Heroku ou DigitalOcean
 
 ## Contribuer
 
