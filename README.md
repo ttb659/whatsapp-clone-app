@@ -1,6 +1,11 @@
-# WhatsApp Clone
+# WhatsApp Clone App
 
 Une application de messagerie en temps réel inspirée de WhatsApp, construite avec Laravel (backend) et Angular (frontend).
+
+## Démo en ligne
+
+Vous pouvez accéder à une démo de l'application à l'adresse suivante :
+- Frontend : https://ttb659.github.io/whatsapp-clone-app (à venir)
 
 ## Fonctionnalités
 
@@ -37,8 +42,8 @@ Une application de messagerie en temps réel inspirée de WhatsApp, construite a
 
 1. Cloner le dépôt :
 ```bash
-git clone https://github.com/votre-utilisateur/whatsapp-clone.git
-cd whatsapp-clone
+git clone https://github.com/ttb659/whatsapp-clone-app.git
+cd whatsapp-clone-app
 ```
 
 2. Installer les dépendances du backend :
@@ -83,19 +88,19 @@ Ou démarrez-les séparément :
 1. Backend :
 ```bash
 cd whatsapp-clone-backend
-php artisan serve --host=0.0.0.0 --port=12000
+php artisan serve --host=0.0.0.0 --port=8000
 ```
 
 2. Frontend :
 ```bash
 cd whatsapp-clone-frontend
-ng serve --host 0.0.0.0 --port 12001 --disable-host-check
+ng serve --host 0.0.0.0 --port=4200
 ```
 
 ## Accès à l'application
 
-- Backend API : http://localhost:12000
-- Frontend : http://localhost:12001
+- Backend API : http://localhost:8000
+- Frontend : http://localhost:4200
 
 ## Structure du projet
 
@@ -114,6 +119,10 @@ ng serve --host 0.0.0.0 --port 12001 --disable-host-check
 - `src/app/guards` : Gardes pour protéger les routes
 - `src/app/interceptors` : Intercepteurs HTTP pour l'authentification
 
+## Captures d'écran
+
+*À venir*
+
 ## Développement futur
 
 - Implémentation des notifications push avec Firebase Cloud Messaging
@@ -121,6 +130,10 @@ ng serve --host 0.0.0.0 --port 12001 --disable-host-check
 - Chiffrement de bout en bout des messages
 - Appels audio et vidéo
 - Mode sombre/clair
+
+## Contribuer
+
+Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou à soumettre une pull request.
 
 ## Licence
 
